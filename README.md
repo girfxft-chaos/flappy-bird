@@ -1,39 +1,31 @@
-# First-Person Flappy Bird: Blaster Edition 🎮🔫
+# First-Person Flappy Bird: Infinite Blaster Edition 🎮🔫∞
 
-An immersive first-person 3D take on the classic Flappy Bird game with a **weapon system**, built with **Babylon.js** WebGL engine.
+An immersive first-person 3D take on the classic Flappy Bird game with an **infinite weapon system**, built with **Babylon.js** WebGL engine.
 
 ## Features
 
 ✨ **First-Person Perspective** - Experience the game from inside a 3D world  
-🔫 **Blaster Weapon** - Destroy pipes for tactical gameplay  
+🔫 **Infinite Blaster** - Unlimited ammunition for pure action gameplay  
 🎨 **Full 3D Graphics** - Dynamic environments with sky, ground, and detailed obstacles  
 🎯 **Progressive Difficulty** - Game speed and pipe spacing increase as you score  
 🕹️ **Smooth Controls** - Responsive flap and fire mechanics with multiple input methods  
-📊 **Dual Scoring System** - +1 for passing, +5 for destroying pipes  
+📊 **High-Scoring Action** - Blast your way through obstacles for maximum points  
 🎮 **Restart Functionality** - Play again with one click
 
-## Gameplay Modes
+## Pure Action Gameplay
 
-### Classic Approach
-Navigate through pipe gaps without firing - conservative ammo usage, 1 point per pipe
-
-### Aggressive Approach  
-Blast your way through obstacles - costs ammo but rewards you with 5 points per destroyed pipe
-
-### Strategic Play
-Mix both approaches to maximize your score!
+Forget ammo management! Fire continuously without limits. Blast through obstacles for +5 points each, or fly through gaps for +1 point. Pure arcade action!
 
 ## How to Play
 
 1. **Open** `index.html` in your web browser
 2. **Controls:**
    - **SPACEBAR** - Flap upward
-   - **CLICK or F** - Fire blaster
+   - **CLICK or F** - Fire blaster (unlimited!)
    - **Touch** - Flap (on mobile)
-3. **Navigate** through green pipe gaps
-4. **Destroy** pipes with your blaster for bonus points
-5. **Avoid** hitting any pipe, ground, or ceiling
-6. **Manage** your 100-round ammo supply strategically
+3. **Navigate** through green pipe gaps OR blast them
+4. **Destroy** pipes with your infinite blaster for bonus points
+5. **Avoid** hitting any pipe, ground, or ceiling that you can't destroy in time
 
 ## Game Mechanics
 
@@ -42,12 +34,12 @@ Mix both approaches to maximize your score!
 - Each flap provides an upward velocity boost
 - Realistic inertia and momentum
 
-### Blaster System
-- **100 Ammo** - Limited ammunition to manage
+### Infinite Blaster System
+- **Unlimited Ammo** - Fire continuously without restrictions!
 - **Fire Rate** - Rapid-fire capability (0.2 second cooldown)
 - **Projectiles** - Yellow glowing energy balls travel forward
-- **Explosions** - Visual effects when pipes are destroyed
-- **Ammo Display** - Gold bar shows remaining ammunition
+- **Explosions** - Satisfying visual effects when pipes are destroyed
+- **No Limits** - Blast to your heart's content!
 
 ### Obstacles
 - Randomly generated pipes with variable gap sizes
@@ -72,8 +64,7 @@ Mix both approaches to maximize your score!
 
 - 🎯 **Crosshair** - Center screen aiming reticle with crosshairs
 - 📊 **Score Display** - Real-time score counter (top-left)
-- 🔫 **Ammo Counter** - Shows remaining ammo (bottom-left)
-- 📈 **Ammo Bar** - Gold gradient bar showing ammunition level
+- 🔫 **Infinite Ammo Indicator** - Pulsing ∞ symbol (bottom-left)
 - 💥 **Muzzle Flash** - Visual feedback when firing
 - 🎆 **Explosion Effects** - Particles when pipes are destroyed
 
@@ -85,9 +76,8 @@ You can customize gameplay by modifying these variables in `game.js`:
 player.gravity = 0.0006;      // Gravity strength
 player.jumpPower = 0.15;      // Flap power
 pipeGap = 1.5;                // Gap between pipes
-blaster.ammo = 100;           // Starting ammo
-blaster.maxAmmo = 100;        // Max ammo
 projectileSpeed = 0.5;        // Bullet speed
+blaster.fireRate = 0.2;       // Fire rate (seconds between shots)
 ```
 
 ## Project Structure
@@ -95,7 +85,7 @@ projectileSpeed = 0.5;        // Bullet speed
 ```
 flappy-bird/
 ├── index.html       # Main game page with UI
-├── game.js          # Game engine & blaster system
+├── game.js          # Game engine & infinite blaster system
 └── README.md        # Documentation
 ```
 
@@ -118,22 +108,28 @@ flappy-bird/
 |--------|--------|
 | Pass through pipe gap | +1 |
 | Destroy pipe with blaster | +5 |
-| **Sweet Spot** | Destroy the hardest pipes with limited ammo |
+| **Optimal Play** | Mix strategies for flow state |
 
 ## Tips for High Scores
 
-1. **Conserve Ammo** - Use blaster only for impossible gaps
-2. **Mix Strategies** - Alternate between passing and destroying
+1. **Blast Everything** - With infinite ammo, destroy pipes for consistent +5 point rewards
+2. **Flow State** - Find your rhythm between flapping and blasting
 3. **Timing** - Fire early to give projectiles time to travel
-4. **Challenge Yourself** - Try to finish without using all ammo
+4. **Challenge** - Try pure flying, pure blasting, or mixed approaches!
+
+## Why Infinite Ammo?
+
+- **Pure Fun** - No resource management, just action
+- **Arcade Feel** - Classic unlimited weapon gameplay
+- **Accessibility** - Focus on dodging and aiming, not rationing
+- **High Scores** - Blast through every obstacle!
 
 ## Future Enhancements
 
 - [ ] Sound effects and background music
-- [ ] Ammo pickups
-- [ ] Different weapon types (spread shot, rapid fire)
-- [ ] Enemy drones
-- [ ] Power-ups (shield, double points)
+- [ ] Different weapon types (spread shot, rapid fire, missile)
+- [ ] Enemy drones to battle
+- [ ] Power-ups (shield, invincibility, double points)
 - [ ] Leaderboard system
 - [ ] Multiple difficulty modes
 - [ ] Seasonal themes
@@ -142,4 +138,4 @@ flappy-bird/
 
 Open source - feel free to fork and modify!
 
-Enjoy blasting through the skies! 🚀💥
+Enjoy unlimited blasting! 🚀💥∞
