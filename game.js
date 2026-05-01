@@ -13,10 +13,8 @@ let nextPipeX = 5;
 let spawnRate = 3.5;
 let gameSpeed = 0.025;
 
-// Blaster variables
+// Blaster variables (INFINITE AMMO)
 let blaster = { 
-    ammo: 100, 
-    maxAmmo: 100, 
     fireRate: 0.2, 
     lastShotTime: 0,
     position: new BABYLON.Vector3(0.3, -0.2, 0.5)
@@ -156,16 +154,14 @@ function createBlasterVisual() {
     grip.position = new BABYLON.Vector3(0.25, -0.25, 0.4);
 }
 
-// Fire blaster
+// Fire blaster (INFINITE AMMO - NO CHECKS)
 function fire() {
     if (!gameActive) return;
     
     const now = performance.now();
     if (now - blaster.lastShotTime < blaster.fireRate * 1000) return;
-    if (blaster.ammo <= 0) return;
     
     blaster.lastShotTime = now;
-    blaster.ammo--;
     
     // Create projectile
     const projectile = BABYLON.MeshBuilder.CreateSphere('projectile', { 
@@ -191,9 +187,6 @@ function fire() {
     
     // Add visual feedback
     addMuzzleFlash();
-    
-    // Update ammo display
-    document.getElementById('ammo').textContent = blaster.ammo;
 }
 
 // Add muzzle flash effect
@@ -413,7 +406,6 @@ function restartGame() {
     spawnRate = 3.5;
     gameSpeed = 0.025;
     nextPipeX = 5;
-    blaster.ammo = blaster.maxAmmo;
     
     // Clear pipes
     pipes.forEach(pipe => {
@@ -430,7 +422,6 @@ function restartGame() {
     
     // Update UI
     document.getElementById('score').textContent = '0';
-    document.getElementById('ammo').textContent = blaster.maxAmmo;
     document.getElementById('gameOverScreen').style.display = 'none';
     
     // Reset camera
