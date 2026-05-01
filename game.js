@@ -13,6 +13,17 @@ let nextPipeX = 5;
 let spawnRate = 3.5;
 let gameSpeed = 0.025;
 
+// Blaster variables
+let blaster = { 
+    ammo: 100, 
+    maxAmmo: 100, 
+    fireRate: 0.2, 
+    lastShotTime: 0,
+    position: new BABYLON.Vector3(0.3, -0.2, 0.5)
+};
+let projectiles = [];
+let projectileSpeed = 0.5;
+
 // Initialize game
 window.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('renderCanvas');
@@ -25,10 +36,24 @@ window.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             flap();
         }
+        if (e.code === 'KeyF') {
+            fire();
+        }
     });
     
-    document.addEventListener('click', flap);
-    document.addEventListener('touchstart', flap);
+    document.addEventListener('click', (e) => {
+        // Check if click is on game over screen
+        if (!document.getElementById('gameOverScreen').style.display || 
+            document.getElementById('gameOverScreen').style.display === 'none') {
+            fire();
+        }
+    });
+    
+    document.addEventListener('touchstart', (e) => {
+        if (e.target === engine.getRenderingCanvas()) {
+            flap();
+        }
+    });
     
     // Game loop
     engine.runRenderLoop(() => {
@@ -97,13 +122,98 @@ function createScene() {
     
     const rightWall = leftWall.clone('rightWall');
     rightWall.position.x = 5;
+    
+    // Create blaster in view (visual representation)
+    createBlasterVisual();
 }
 
-// Flap action
-function flap() {
-    if (gameActive) {
-        player.vy = player.jumpPower;
-    }
+// Create blaster visual
+function createBlasterVisual() {
+    // Barrel
+    const barrel = BABYLON.MeshBuilder.CreateCylinder('barrel', { 
+        diameter: 0.1, 
+        height: 0.4, 
+        tessellation: 16 
+    }, scene);
+    const barrelMat = new BABYLON.StandardMaterial('barrelMat', scene);
+    barrelMat.diffuse = new BABYLON.Color3(0.3, 0.3, 0.3);
+    barrelMat.metallic = 0.8;
+    barrelMat.roughness = 0.2;
+    barrel.material = barrelMat;
+    barrel.parent = camera;
+    barrel.position = new BABYLON.Vector3(0.3, -0.15, 0.6);
+    barrel.rotation.z = Math.PI / 2;
+    
+    // Grip
+    const grip = BABYLON.MeshBuilder.CreateBox('grip', { 
+        width: 0.08, 
+        height: 0.3, 
+        depth: 0.08 
+    }, scene);
+    grip.material = new BABYLON.StandardMaterial('gripMat', scene);
+    grip.material.diffuse = new BABYLON.Color3(0.2, 0.2, 0.2);
+    grip.parent = camera;
+    grip.position = new BABYLON.Vector3(0.25, -0.25, 0.4);
+}
+
+// Fire blaster
+function fire() {
+    if (!gameActive) return;
+    
+    const now = performance.now();
+    if (now - blaster.lastShotTime < blaster.fireRate * 1000) return;
+    if (blaster.ammo <= 0) return;
+    
+    blaster.lastShotTime = now;
+    blaster.ammo--;
+    
+    // Create projectile
+    const projectile = BABYLON.MeshBuilder.CreateSphere('projectile', { 
+        diameter: 0.1, 
+        segments: 8 
+    }, scene);
+    const projectileMat = new BABYLON.StandardMaterial('projMat', scene);
+    projectileMat.emissiveColor = new BABYLON.Color3(1, 1, 0); // Yellow
+    projectileMat.specularColor = new BABYLON.Color3(1, 1, 0);
+    projectile.material = projectileMat;
+    
+    // Position at camera
+    projectile.position = camera.position.clone();
+    projectile.position.x += 0.3;
+    projectile.position.z += 0.5;
+    
+    projectiles.push({
+        mesh: projectile,
+        x: projectile.position.x,
+        vx: projectileSpeed,
+        life: 200 // frames
+    });
+    
+    // Add visual feedback
+    addMuzzleFlash();
+    
+    // Update ammo display
+    document.getElementById('ammo').textContent = blaster.ammo;
+}
+
+// Add muzzle flash effect
+function addMuzzleFlash() {
+    const flash = BABYLON.MeshBuilder.CreateSphere('flash', { diameter: 0.2 }, scene);
+    const flashMat = new BABYLON.StandardMaterial('flashMat', scene);
+    flashMat.emissiveColor = new BABYLON.Color3(1, 0.5, 0);
+    flash.material = flashMat;
+    flash.parent = camera;
+    flash.position = new BABYLON.Vector3(0.3, -0.15, 0.75);
+    
+    let alpha = 1;
+    const fadeInterval = setInterval(() => {
+        alpha -= 0.2;
+        flashMat.alpha = alpha;
+        if (alpha <= 0) {
+            clearInterval(fadeInterval);
+            flash.dispose();
+        }
+    }, 50);
 }
 
 // Update game state
@@ -148,9 +258,41 @@ function updateGame() {
             pipes.splice(i, 1);
         }
         
-        // Check collision
+        // Check collision with player
         if (checkCollision(pipe)) {
             endGame();
+        }
+    }
+    
+    // Update projectiles
+    for (let i = projectiles.length - 1; i >= 0; i--) {
+        const proj = projectiles[i];
+        proj.x += proj.vx;
+        proj.mesh.position.x = proj.x;
+        proj.life--;
+        
+        // Check collision with pipes
+        let hit = false;
+        for (let j = pipes.length - 1; j >= 0; j--) {
+            const pipe = pipes[j];
+            const dist = Math.abs(proj.x - pipe.x);
+            const yDist = Math.abs(proj.mesh.position.y - pipe.gapCenter);
+            
+            // Check if projectile hits top or bottom pipe
+            if (dist < pipeWidth / 2 + 0.05) {
+                if (yDist > pipeGap / 2 + 0.1) {
+                    // Hit the pipe
+                    destroyPipe(j);
+                    hit = true;
+                    break;
+                }
+            }
+        }
+        
+        // Remove projectile if hit or out of range
+        if (hit || proj.life <= 0 || proj.x > 50) {
+            proj.mesh.dispose();
+            projectiles.splice(i, 1);
         }
     }
     
@@ -158,6 +300,41 @@ function updateGame() {
     if (player.y > 3 || player.y < -3) {
         endGame();
     }
+}
+
+// Destroy a pipe
+function destroyPipe(index) {
+    const pipe = pipes[index];
+    
+    // Create explosion effect
+    const explosion = BABYLON.MeshBuilder.CreateSphere('explosion', { diameter: 0.5 }, scene);
+    const explosionMat = new BABYLON.StandardMaterial('explosionMat', scene);
+    explosionMat.emissiveColor = new BABYLON.Color3(1, 0.5, 0);
+    explosion.material = explosionMat;
+    explosion.position.x = pipe.x;
+    explosion.position.y = pipe.gapCenter;
+    
+    let scale = 1;
+    let alpha = 1;
+    const expandInterval = setInterval(() => {
+        scale += 0.15;
+        alpha -= 0.2;
+        explosion.scaling = new BABYLON.Vector3(scale, scale, scale);
+        explosionMat.alpha = alpha;
+        if (alpha <= 0) {
+            clearInterval(expandInterval);
+            explosion.dispose();
+        }
+    }, 50);
+    
+    // Bonus points for destroying pipe
+    score += 5;
+    document.getElementById('score').textContent = score;
+    
+    // Remove pipe
+    pipe.topMesh.dispose();
+    pipe.bottomMesh.dispose();
+    pipes.splice(index, 1);
 }
 
 // Spawn a pipe obstacle
@@ -213,6 +390,13 @@ function checkCollision(pipe) {
     return false;
 }
 
+// Flap action
+function flap() {
+    if (gameActive) {
+        player.vy = player.jumpPower;
+    }
+}
+
 // End game
 function endGame() {
     gameActive = false;
@@ -229,6 +413,7 @@ function restartGame() {
     spawnRate = 3.5;
     gameSpeed = 0.025;
     nextPipeX = 5;
+    blaster.ammo = blaster.maxAmmo;
     
     // Clear pipes
     pipes.forEach(pipe => {
@@ -237,8 +422,15 @@ function restartGame() {
     });
     pipes = [];
     
+    // Clear projectiles
+    projectiles.forEach(proj => {
+        proj.mesh.dispose();
+    });
+    projectiles = [];
+    
     // Update UI
     document.getElementById('score').textContent = '0';
+    document.getElementById('ammo').textContent = blaster.maxAmmo;
     document.getElementById('gameOverScreen').style.display = 'none';
     
     // Reset camera
