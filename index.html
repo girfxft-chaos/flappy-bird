@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>First-Person Flappy Bird</title>
+    <title>First-Person Flappy Bird - Blaster Edition</title>
     <style>
         body {
             margin: 0;
@@ -24,6 +24,63 @@
             font-size: 24px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             z-index: 10;
+        }
+        #ammoDisplay {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            color: #FFD700;
+            font-size: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 10;
+            font-weight: bold;
+        }
+        #ammoBar {
+            width: 200px;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        #ammoFill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            width: 100%;
+            transition: width 0.1s;
+        }
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 215, 0, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        #crosshair::before,
+        #crosshair::after {
+            content: '';
+            position: absolute;
+            background-color: rgba(255, 215, 0, 0.7);
+        }
+        #crosshair::before {
+            width: 2px;
+            height: 10px;
+            left: 50%;
+            top: -15px;
+            transform: translateX(-50%);
+        }
+        #crosshair::after {
+            width: 10px;
+            height: 2px;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
         }
         #gameOverScreen {
             position: absolute;
@@ -73,19 +130,47 @@
 </head>
 <body>
     <canvas id="renderCanvas"></canvas>
+    
+    <!-- Crosshair -->
+    <div id="crosshair"></div>
+    
+    <!-- Score Display -->
     <div id="ui">
         <div>Score: <span id="score">0</span></div>
     </div>
+    
+    <!-- Ammo Display -->
+    <div id="ammoDisplay">
+        🔫 Ammo: <span id="ammo">100</span>/100
+        <div id="ammoBar">
+            <div id="ammoFill"></div>
+        </div>
+    </div>
+    
+    <!-- Game Over Screen -->
     <div id="gameOverScreen">
         <h1>Game Over!</h1>
         <p>Final Score: <span id="finalScore">0</span></p>
         <button onclick="restartGame()">Play Again</button>
     </div>
+    
+    <!-- Instructions -->
     <div id="instructions">
-        <div>SPACE or CLICK to flap • Don't hit the pipes!</div>
+        <div>SPACE to flap • CLICK or F to blast • Destroy pipes for +5 points!</div>
     </div>
 
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
     <script src="game.js"></script>
+    
+    <script>
+        // Update ammo bar
+        function updateAmmoBar() {
+            const ammoPercent = (window.blaster?.ammo || 100) / 100 * 100;
+            document.getElementById('ammoFill').style.width = ammoPercent + '%';
+        }
+        
+        // Update ammo bar every frame
+        setInterval(updateAmmoBar, 16);
+    </script>
 </body>
 </html>
